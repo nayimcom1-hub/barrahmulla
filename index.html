@@ -183,85 +183,124 @@ footer{
 <footer>Official Club Management Panel</footer>
 
 <script>
+
 let players = [];
+let editingId = null;
 const ADMIN_PASSWORD = "1234";
 
-// Firebase Config
+// Firebase Config (আপনার আগেরটাই রাখুন)
 const firebaseConfig = {
   apiKey: "AIzaSyCkYMVn0Jh4Oo8Mgm8WyVAOVe65lSLGeks",
   authDomain: "barrahms-app.firebaseapp.com",
   projectId: "barrahms-app",
   storageBucket: "barrahms-app.firebasestorage.app",
   messagingSenderId: "886499355529",
-  appId: "1:886499355529:web:051977ab95fdc3d9b5cf58",
-  measurementId: "G-34HG0VVZFY"
+  appId: "1:886499355529:web:051977ab95fdc3d9b5cf58"
 };
 
-// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// Buttons
-document.getElementById("admissionBtn").addEventListener("click",()=>showSection("admission"));
-document.getElementById("playersBtn").addEventListener("click",showPlayers);
-document.getElementById("submitBtn").addEventListener("click",submitPlayer);
+document.getElementById("admissionBtn")
+  .addEventListener("click",()=>showSection("admission"));
 
-// Show section
+document.getElementById("playersBtn")
+  .addEventListener("click",showPlayers);
+
+document.getElementById("submitBtn")
+  .addEventListener("click",submitPlayer);
+
+
+// Show Section
 function showSection(id){
-  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+  document.querySelectorAll(".section")
+    .forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 }
 
-// Submit player
-function submitPlayer() {
-  const nameInput = document.getElementById("name");
-  if(nameInput.value.trim() === "") { alert("Player name required"); return; }
+
+// Submit / Update Player
+function submitPlayer(){
+
+  const name = document.getElementById("name").value.trim();
+  if(name===""){ alert("Player name required"); return; }
 
   let dob = document.getElementById("dob").value;
   let age = dob ? new Date().getFullYear() - new Date(dob).getFullYear() : "";
-  let file = document.getElementById("photo").files[0];
-  let admissionDate = new Date().toLocaleDateString();
+
+  let jersey = document.getElementById("jersey").value;
+
+  // 🔥 Jersey duplicate check (Add mode only)
+  if(!editingId){
+    let duplicate = players.find(p=>p.jersey===jersey);
+    if(duplicate){
+      alert("Jersey number already exists!");
+      return;
+    }
+  }
 
   let playerData = {
-    name: nameInput.value,
+    name: name,
     father: document.getElementById("father").value,
     address: document.getElementById("address").value,
     dob: dob,
     age: age,
-    jersey: document.getElementById("jersey").value,
+    jersey: jersey,
     position: document.getElementById("position").value,
-    admissionDate: admissionDate,
-    photo: ""
+    admissionDate: new Date().toLocaleDateString()
   };
 
-  if(file){
-    let reader = new FileReader();
-    reader.onload = ()=>{
-      playerData.photo = reader.result;
+  let file = document.getElementById("photo").files[0];
+
+  if(editingId){
+    // UPDATE MODE
+    if(file){
+      let reader = new FileReader();
+      reader.onload = ()=>{
+        playerData.photo = reader.result;
+        db.collection("players").doc(editingId)
+          .update(playerData)
+          .then(()=>{ alert("Updated Successfully"); resetForm(); });
+      };
+      reader.readAsDataURL(file);
+    }else{
+      db.collection("players").doc(editingId)
+        .update(playerData)
+        .then(()=>{ alert("Updated Successfully"); resetForm(); });
+    }
+
+  }else{
+    // ADD MODE
+    if(file){
+      let reader = new FileReader();
+      reader.onload = ()=>{
+        playerData.photo = reader.result;
+        db.collection("players").add(playerData)
+          .then(()=>{ alert("Admission Successful"); resetForm(); });
+      };
+      reader.readAsDataURL(file);
+    }else{
       db.collection("players").add(playerData)
-        .then(()=>{ alert("Admission Successful"); clearForm(); loadPlayers(); })
-        .catch(err=>alert(err));
-    };
-    reader.readAsDataURL(file);
-  } else {
-    db.collection("players").add(playerData)
-      .then(()=>{ alert("Admission Successful"); clearForm(); loadPlayers(); })
-      .catch(err=>alert(err));
+        .then(()=>{ alert("Admission Successful"); resetForm(); });
+    }
   }
 }
 
-// Clear form
-function clearForm(){
-  document.getElementById("name").value="";
-  document.getElementById("father").value="";
-  document.getElementById("address").value="";
-  document.getElementById("dob").value="";
-  document.getElementById("jersey").value="";
-  document.getElementById("position").value="";
-  document.getElementById("photo").value="";
+
+// Reset Form
+function resetForm(){
+  editingId = null;
+  document.getElementById("submitBtn").innerText="Submit Admission";
+
+  document.querySelectorAll("#admission input")
+    .forEach(i=>i.value="");
+
+  loadPlayers();
+  showPlayers();
 }
 
-// Load players
+
+// Load Players
 function loadPlayers(){
   db.collection("players").get().then(snapshot=>{
     players = snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));
@@ -269,13 +308,21 @@ function loadPlayers(){
   });
 }
 
-// Show players
-function showPlayers(){ showSection("players"); loadPlayers(); }
 
-// Render players
+// Show Players
+function showPlayers(){
+  showSection("players");
+  loadPlayers();
+}
+
+
+// Render Players
 function renderPlayers(list){
+
   const playerList = document.getElementById("playerList");
-  playerList.innerHTML = "";
+  playerList.innerHTML =
+    `<h4>Total Players: ${list.length}</h4>`;
+
   list.forEach((p,i)=>{
     playerList.innerHTML += `
       <div class="player-card">
@@ -295,62 +342,64 @@ function renderPlayers(list){
   });
 }
 
-// Show details
+
+// Show Details
 function showDetails(i){
   let p = players[i];
   const detailBox = document.getElementById("detailBox");
+
   detailBox.innerHTML = `
     ${p.photo?`<img src="${p.photo}">`:``}
     <b>Name:</b> ${p.name}<br>
     <b>Father:</b> ${p.father}<br>
     <b>Address:</b> ${p.address}<br>
-    <b>Date of Birth:</b> ${p.dob}<br>
+    <b>DOB:</b> ${p.dob}<br>
     <b>Age:</b> ${p.age}<br>
     <b>Jersey:</b> ${p.jersey}<br>
     <b>Position:</b> ${p.position}<br>
     <b>Admission Date:</b> ${p.admissionDate}`;
+
   showSection("details");
 }
 
-// Edit player
+
+// Edit Player
 function editPlayer(i){
   let pass = prompt("Admin password");
-  if(pass!==ADMIN_PASSWORD) return alert("Wrong password");
-  let p = players[i];
-  showSection("admission");
-  document.getElementById("name").value = p.name;
-  document.getElementById("father").value = p.father;
-  document.getElementById("address").value = p.address;
-  document.getElementById("dob").value = p.dob;
-  document.getElementById("jersey").value = p.jersey;
-  document.getElementById("position").value = p.position;
+  if(pass!==ADMIN_PASSWORD){ alert("Wrong password"); return; }
 
-  document.getElementById("submitBtn").onclick = ()=>{
-    let file = document.getElementById("photo").files[0];
-    if(file){
-      let reader = new FileReader();
-      reader.onload = ()=>{
-        p.photo = reader.result;
-        db.collection("players").doc(p.id).set({...p})
-          .then(()=>{ alert("Updated Successfully"); clearForm(); loadPlayers(); });
-      };
-      reader.readAsDataURL(file);
-    } else {
-      db.collection("players").doc(p.id).set({...p})
-        .then(()=>{ alert("Updated Successfully"); clearForm(); loadPlayers(); });
-    }
-  };
+  let p = players[i];
+  editingId = p.id;
+
+  showSection("admission");
+
+  document.getElementById("submitBtn")
+    .innerText="Update Player";
+
+  document.getElementById("name").value=p.name;
+  document.getElementById("father").value=p.father;
+  document.getElementById("address").value=p.address;
+  document.getElementById("dob").value=p.dob;
+  document.getElementById("jersey").value=p.jersey;
+  document.getElementById("position").value=p.position;
 }
 
-// Delete player
+
+// Delete Player
 function deletePlayer(i){
   let pass = prompt("Admin password");
-  if(pass===ADMIN_PASSWORD){
-    db.collection("players").doc(players[i].id).delete().then(()=>loadPlayers());
-  } else alert("Wrong password");
+  if(pass!==ADMIN_PASSWORD){ alert("Wrong password"); return; }
+
+  if(confirm("Are you sure to delete this player?")){
+    db.collection("players")
+      .doc(players[i].id)
+      .delete()
+      .then(()=>loadPlayers());
+  }
 }
 
-// Search player
+
+// Search
 function searchPlayer(){
   let v = document.getElementById("search").value.toLowerCase();
   renderPlayers(players.filter(p=>
@@ -359,7 +408,9 @@ function searchPlayer(){
     p.age.toString().includes(v)
   ));
 }
-</script>
 
+</script>
+  
 </body>
 </html>
+
