@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <title>Barrah Mullah Kandha Sporting Club</title>
 
-<!-- Firebase SDK (compat version) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
@@ -52,6 +51,7 @@ header{
 }
 #admissionBtn{background:var(--secondary)}
 #playersBtn{background:var(--primary)}
+
 .section{
   display:none;
   background:#fff;
@@ -86,6 +86,17 @@ input{
   font-weight:600;
   cursor:pointer;
 }
+
+.total-badge{
+  display:inline-block;
+  background:var(--secondary);
+  color:#fff;
+  padding:6px 14px;
+  border-radius:20px;
+  font-size:14px;
+  margin-bottom:12px;
+}
+
 .player-card{
   display:flex;
   gap:12px;
@@ -107,19 +118,35 @@ input{
   font-size:14px;
 }
 .player-info b{font-size:15px}
-.card-actions button{
-  width:100%;
+
+.player-number{
+  font-weight:700;
+  font-size:16px;
+  color:var(--primary);
+  margin-right:6px;
+}
+
+.card-actions{
+  display:flex;
+  gap:6px;
   margin-top:6px;
-  padding:8px;
+}
+
+.card-actions button{
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  padding:0;
+  font-size:14px;
   border:none;
-  border-radius:18px;
-  font-size:13px;
   cursor:pointer;
   color:#fff;
 }
+
 .info-btn{background:var(--secondary)}
 .edit-btn{background:#2563eb}
 .delete-btn{background:#dc2626}
+
 #detailBox img{
   width:80px;
   height:100px;
@@ -151,7 +178,6 @@ footer{
   <button id="playersBtn">Players List</button>
 </div>
 
-<!-- ADMISSION -->
 <div id="admission" class="section active">
 <h3>Admission Form</h3>
 <input id="name" placeholder="Player Name">
@@ -164,14 +190,12 @@ footer{
 <button id="submitBtn" class="submit-btn">Submit Admission</button>
 </div>
 
-<!-- PLAYERS -->
 <div id="players" class="section">
 <h3>Players List</h3>
 <input id="search" placeholder="Search by name / age / position" onkeyup="searchPlayer()">
 <div id="playerList"></div>
 </div>
 
-<!-- DETAILS -->
 <div id="details" class="section">
 <h3>Player Information</h3>
 <div id="detailBox"></div>
@@ -188,14 +212,10 @@ let players = [];
 let editingId = null;
 const ADMIN_PASSWORD = "1234";
 
-// Firebase Config (আপনার আগেরটাই রাখুন)
 const firebaseConfig = {
   apiKey: "AIzaSyCkYMVn0Jh4Oo8Mgm8WyVAOVe65lSLGeks",
   authDomain: "barrahms-app.firebaseapp.com",
   projectId: "barrahms-app",
-  storageBucket: "barrahms-app.firebasestorage.app",
-  messagingSenderId: "886499355529",
-  appId: "1:886499355529:web:051977ab95fdc3d9b5cf58"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -210,16 +230,12 @@ document.getElementById("playersBtn")
 document.getElementById("submitBtn")
   .addEventListener("click",submitPlayer);
 
-
-// Show Section
 function showSection(id){
   document.querySelectorAll(".section")
     .forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 }
 
-
-// Submit / Update Player
 function submitPlayer(){
 
   const name = document.getElementById("name").value.trim();
@@ -230,22 +246,18 @@ function submitPlayer(){
 
   let jersey = document.getElementById("jersey").value;
 
-  // 🔥 Jersey duplicate check (Add mode only)
   if(!editingId){
     let duplicate = players.find(p=>p.jersey===jersey);
-    if(duplicate){
-      alert("Jersey number already exists!");
-      return;
-    }
+    if(duplicate){ alert("Jersey number already exists!"); return; }
   }
 
   let playerData = {
-    name: name,
+    name,
     father: document.getElementById("father").value,
     address: document.getElementById("address").value,
-    dob: dob,
-    age: age,
-    jersey: jersey,
+    dob,
+    age,
+    jersey,
     position: document.getElementById("position").value,
     admissionDate: new Date().toLocaleDateString()
   };
@@ -253,7 +265,6 @@ function submitPlayer(){
   let file = document.getElementById("photo").files[0];
 
   if(editingId){
-    // UPDATE MODE
     if(file){
       let reader = new FileReader();
       reader.onload = ()=>{
@@ -268,9 +279,7 @@ function submitPlayer(){
         .update(playerData)
         .then(()=>{ alert("Updated Successfully"); resetForm(); });
     }
-
   }else{
-    // ADD MODE
     if(file){
       let reader = new FileReader();
       reader.onload = ()=>{
@@ -286,21 +295,14 @@ function submitPlayer(){
   }
 }
 
-
-// Reset Form
 function resetForm(){
   editingId = null;
   document.getElementById("submitBtn").innerText="Submit Admission";
-
-  document.querySelectorAll("#admission input")
-    .forEach(i=>i.value="");
-
+  document.querySelectorAll("#admission input").forEach(i=>i.value="");
   loadPlayers();
   showPlayers();
 }
 
-
-// Load Players
 function loadPlayers(){
   db.collection("players").get().then(snapshot=>{
     players = snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));
@@ -308,42 +310,41 @@ function loadPlayers(){
   });
 }
 
-
-// Show Players
 function showPlayers(){
   showSection("players");
   loadPlayers();
 }
 
-
-// Render Players
 function renderPlayers(list){
 
   const playerList = document.getElementById("playerList");
+
   playerList.innerHTML =
-    `<h4>Total Players: ${list.length}</h4>`;
+    `<div class="total-badge">
+        Total Players: ${list.length}
+     </div>`;
 
   list.forEach((p,i)=>{
     playerList.innerHTML += `
       <div class="player-card">
         ${p.photo?`<img src="${p.photo}">`:``}
         <div class="player-info">
+          <span class="player-number">${i+1}.</span>
           <b>${p.name}</b><br>
           Age: ${p.age}<br>
           Jersey: ${p.jersey}<br>
           Position: ${p.position}
+
           <div class="card-actions">
-            <button class="info-btn" onclick="showDetails(${i})">Information</button>
-            <button class="edit-btn" onclick="editPlayer(${i})">Edit</button>
-            <button class="delete-btn" onclick="deletePlayer(${i})">Delete</button>
+            <button class="info-btn" onclick="showDetails(${i})">ℹ️</button>
+            <button class="edit-btn" onclick="editPlayer(${i})">✏️</button>
+            <button class="delete-btn" onclick="deletePlayer(${i})">🗑️</button>
           </div>
         </div>
       </div>`;
   });
 }
 
-
-// Show Details
 function showDetails(i){
   let p = players[i];
   const detailBox = document.getElementById("detailBox");
@@ -362,15 +363,12 @@ function showDetails(i){
   showSection("details");
 }
 
-
-// Edit Player
 function editPlayer(i){
   let pass = prompt("Admin password");
   if(pass!==ADMIN_PASSWORD){ alert("Wrong password"); return; }
 
   let p = players[i];
   editingId = p.id;
-
   showSection("admission");
 
   document.getElementById("submitBtn")
@@ -384,8 +382,6 @@ function editPlayer(i){
   document.getElementById("position").value=p.position;
 }
 
-
-// Delete Player
 function deletePlayer(i){
   let pass = prompt("Admin password");
   if(pass!==ADMIN_PASSWORD){ alert("Wrong password"); return; }
@@ -398,8 +394,6 @@ function deletePlayer(i){
   }
 }
 
-
-// Search
 function searchPlayer(){
   let v = document.getElementById("search").value.toLowerCase();
   renderPlayers(players.filter(p=>
@@ -410,7 +404,6 @@ function searchPlayer(){
 }
 
 </script>
-  
+
 </body>
 </html>
-
