@@ -2,355 +2,439 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BMK Sporting Club</title>
+<title>Barrah Mullah Kandha Sporting Club</title>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <style>
 :root{
-  --primary:#ff6b00;
-  --secondary:#16a34a;
-  --dark:#111827;
-  --light:#f3f4f6;
-  --card:#fff;
+  --primary:#f26522;
+  --secondary:#2f7d32;
+  --dark:#1f2937;
+  --light:#f4f6f8;
 }
 
 *{box-sizing:border-box}
+
 body{
   margin:0;
   font-family:"Segoe UI",sans-serif;
   background:var(--light);
+  color:var(--dark);
 }
 
-/* ===== TOP NAVBAR ===== */
-.navbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  background:linear-gradient(135deg,var(--primary),#ff9f43);
+header{
+  background:linear-gradient(135deg,var(--primary),#ff9b63);
   color:#fff;
-  padding:12px 16px;
-  position:sticky;
-  top:0;
-  z-index:100;
-}
-
-.navbar h2{
-  margin:0;
-  font-size:18px;
-}
-
-.menu-icon{
+  padding:20px;
+  text-align:center;
   font-size:22px;
-  cursor:pointer;
+  font-weight:600;
 }
 
-.dropdown{
-  display:none;
-  position:absolute;
-  top:50px;
-  right:16px;
-  background:#fff;
-  border-radius:12px;
-  box-shadow:0 4px 18px rgba(0,0,0,.15);
-  overflow:hidden;
-  min-width:180px;
-  z-index:200;
-}
-
-.dropdown button{
-  width:100%;
-  padding:12px 16px;
-  border:none;
-  background:none;
-  text-align:left;
-  cursor:pointer;
-  font-size:14px;
-}
-
-.dropdown button:hover{
-  background:#f3f4f6;
-}
-
-/* ===== CONTAINER ===== */
 .container{
-  max-width:600px;
+  max-width:480px;
   margin:auto;
   padding:16px;
-  padding-bottom:80px;
 }
 
-/* ===== SECTIONS ===== */
+.buttons{
+  display:flex;
+  gap:12px;
+  margin:18px 0;
+}
+
+.buttons button{
+  flex:1;
+  padding:14px;
+  border:none;
+  border-radius:25px;
+  font-size:15px;
+  font-weight:600;
+  cursor:pointer;
+  color:#fff;
+}
+
+#admissionBtn{background:var(--secondary)}
+#playersBtn{background:var(--primary)}
+
 .section{
   display:none;
-  background:var(--card);
-  border-radius:18px;
+  background:#fff;
+  border-radius:14px;
   padding:16px;
-  box-shadow:0 6px 20px rgba(0,0,0,.05);
-  margin-top:16px;
+  box-shadow:0 10px 25px rgba(0,0,0,.08);
 }
 .section.active{display:block}
 
-/* ===== HOME ===== */
-.home-gallery{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
-
-.home-gallery img{
-  width:100%;
-  height:130px;
-  object-fit:cover;
-  border-radius:14px;
-}
-
-/* ===== FORM ===== */
 input{
   width:100%;
   padding:12px;
   margin:8px 0;
-  border-radius:12px;
-  border:1px solid #ddd;
+  border-radius:8px;
+  border:1px solid #d1d5db;
+  font-size:14px;
 }
 
 .submit-btn{
   background:var(--primary);
-  color:#fff;
-  border:none;
-  padding:12px;
-  border-radius:14px;
+  margin-top:10px;
   width:100%;
+  padding:14px;
+  border:none;
+  border-radius:25px;
+  color:#fff;
+  font-size:15px;
+  font-weight:600;
   cursor:pointer;
 }
 
-/* ===== PLAYER CARD ===== */
+/* ===== TOTAL BADGE ===== */
+.total-badge{
+  display:inline-block;
+  background:var(--secondary);
+  color:#fff;
+  padding:6px 16px;
+  border-radius:20px;
+  font-size:14px;
+  margin-bottom:14px;
+}
+
+/* ===== PLAYER CARD FLEX ===== */
 .player-card{
   display:flex;
-  justify-content:space-between;
   align-items:center;
-  padding:12px;
-  margin-top:10px;
-  border-radius:16px;
+  justify-content:space-between;
+  gap:12px;
+  padding:14px;
+  margin-top:14px;
+  border-radius:14px;
   background:#fff;
-  box-shadow:0 4px 15px rgba(0,0,0,.08);
+  box-shadow:0 6px 18px rgba(0,0,0,.08);
+  transition:.3s ease;
+}
+
+.player-card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 12px 25px rgba(0,0,0,.12);
 }
 
 .player-left{
   display:flex;
-  align-items:center;
   gap:12px;
+  align-items:center;
+  flex:1;
 }
 
 .player-card img{
   width:55px;
   height:70px;
   object-fit:cover;
-  border-radius:12px;
+  border-radius:8px;
+  border:2px solid var(--light);
 }
 
 .player-info{
-  font-size:13px;
+  font-size:14px;
 }
 
+.player-number{
+  font-weight:700;
+  font-size:15px;
+  color:var(--primary);
+}
+
+/* ===== ICON BUTTONS ===== */
 .card-actions{
   display:flex;
-  gap:6px;
+  flex-direction:column;
+  gap:8px;
 }
 
 .card-actions button{
+  width:36px;
+  height:36px;
+  border-radius:50%;
   border:none;
-  width:32px;
-  height:32px;
-  border-radius:10px;
-  color:#fff;
   cursor:pointer;
+  font-size:15px;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:.3s ease;
+  box-shadow:0 4px 10px rgba(0,0,0,.15);
 }
 
-.info-btn{background:#22c55e;}
-.edit-btn{background:#3b82f6;}
-.delete-btn{background:#ef4444;}
+.card-actions button:hover{
+  transform:scale(1.15);
+}
 
-/* TOTAL BADGE */
-.total-badge{
-  background:var(--secondary);
-  color:#fff;
-  padding:6px 14px;
-  border-radius:20px;
-  display:inline-block;
+.info-btn{
+  background:linear-gradient(135deg,#2f7d32,#4caf50);
+}
+
+.edit-btn{
+  background:linear-gradient(135deg,#2563eb,#60a5fa);
+}
+
+.delete-btn{
+  background:linear-gradient(135deg,#dc2626,#f87171);
+}
+
+#detailBox img{
+  width:90px;
+  height:110px;
+  object-fit:cover;
+  border-radius:8px;
   margin-bottom:10px;
+}
+
+footer{
+  margin-top:25px;
+  padding:12px;
+  background:var(--primary);
+  color:#fff;
+  text-align:center;
+  font-size:14px;
 }
 </style>
 </head>
+
 <body>
 
-<!-- ===== NAVBAR ===== -->
-<div class="navbar">
-  <h2>BMK Sporting Club</h2>
-  <span class="menu-icon" onclick="toggleDropdown()">☰</span>
-  <div class="dropdown" id="dropdownMenu">
-    <button onclick="showSection('home')">🏠 Home</button>
-    <button onclick="showSection('admission')">📝 Admission Form</button>
-    <button onclick="showSection('players')">⚽ Players List</button>
-    <button onclick="showSection('goals')">🥅 Club Goal Scorers</button>
-    <button onclick="showSection('albums')">📸 Albums</button>
-    <button onclick="showSection('management')">👤 Management</button>
-  </div>
-</div>
+<header>Barrah Mullah Kandha Sporting Club</header>
 
 <div class="container">
 
-<!-- ===== HOME ===== -->
-<div id="home" class="section active">
-  <h3>Welcome to Our Club</h3>
-  <div class="home-gallery">
-    <img src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2">
-    <img src="https://images.unsplash.com/photo-1517649763962-0c623066013b">
-    <img src="https://images.unsplash.com/photo-1599058917765-a780eda07a3e">
-    <img src="https://images.unsplash.com/photo-1521412644187-c49fa049e84d">
-  </div>
+<div class="buttons">
+  <button id="admissionBtn">Admission</button>
+  <button id="playersBtn">Players List</button>
 </div>
 
-<!-- ===== ADMISSION ===== -->
-<div id="admission" class="section">
+<div id="admission" class="section active">
 <h3>Admission Form</h3>
 <input id="name" placeholder="Player Name">
-<input id="father" placeholder="Father Name">
+<input id="father" placeholder="Father's Name">
 <input id="address" placeholder="Address">
 <input id="dob" type="date">
 <input id="jersey" placeholder="Jersey Number">
 <input id="position" placeholder="Position">
 <input id="photo" type="file" accept="image/*">
-<input id="goals" type="number" placeholder="Goals Scored">
-<button class="submit-btn" onclick="submitPlayer()">Submit Player</button>
+<button id="submitBtn" class="submit-btn">Submit Admission</button>
 </div>
 
-<!-- ===== PLAYERS ===== -->
 <div id="players" class="section">
 <h3>Players List</h3>
-<input id="search" placeholder="Search by name / position" onkeyup="searchPlayer()">
+<input id="search" placeholder="Search by name / age / position" onkeyup="searchPlayer()">
 <div id="playerList"></div>
 </div>
 
-<!-- ===== CLUB GOAL SCORERS ===== -->
-<div id="goals" class="section">
-<h3>Club Goal Scorers</h3>
-<div id="goalList"></div>
-</div>
-
-<!-- ===== ALBUMS ===== -->
-<div id="albums" class="section">
-<h3>Club Albums</h3>
-<p>Add images of club matches and trophies here.</p>
-</div>
-
-<!-- ===== MANAGEMENT ===== -->
-<div id="management" class="section">
-<h3>Management</h3>
-<p>Admin / Coaches info here</p>
+<div id="details" class="section">
+<h3>Player Information</h3>
+<div id="detailBox"></div>
+<button class="submit-btn" onclick="showPlayers()">Back to List</button>
 </div>
 
 </div>
+
+<footer>Official Club Management Panel</footer>
 
 <script>
-let players=[];
-const ADMIN_PASSWORD="1234";
 
-const firebaseConfig={
+let players = [];
+let editingId = null;
+const ADMIN_PASSWORD = "1234";
+
+/* 🔥 আপনার নিজের Firebase Config বসান */
+const firebaseConfig = {
   apiKey: "AIzaSyCkYMVn0Jh4Oo8Mgm8WyVAOVe65lSLGeks",
   authDomain: "barrahms-app.firebaseapp.com",
   projectId: "barrahms-app",
 };
-firebase.initializeApp(firebaseConfig);
-const db=firebase.firestore();
 
-function toggleDropdown(){
-  const d=document.getElementById('dropdownMenu');
-  d.style.display=d.style.display==='block'?'none':'block';
-}
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+document.getElementById("admissionBtn")
+  .addEventListener("click",()=>showSection("admission"));
+
+document.getElementById("playersBtn")
+  .addEventListener("click",showPlayers);
+
+document.getElementById("submitBtn")
+  .addEventListener("click",submitPlayer);
 
 function showSection(id){
-  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+  document.querySelectorAll(".section")
+    .forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
-  document.getElementById('dropdownMenu').style.display='none';
-  if(id==='players') loadPlayers();
-  if(id==='goals') showGoals();
 }
 
 function submitPlayer(){
-  let player={
-    name:name.value,
-    father:father.value,
-    address:address.value,
-    dob:dob.value,
-    jersey:jersey.value,
-    position:position.value,
-    goals:Number(goals.value),
+
+  const name = document.getElementById("name").value.trim();
+  if(name===""){ alert("Player name required"); return; }
+
+  let dob = document.getElementById("dob").value;
+  let age = dob ? new Date().getFullYear() - new Date(dob).getFullYear() : "";
+  let jersey = document.getElementById("jersey").value;
+
+  if(!editingId){
+    let duplicate = players.find(p=>p.jersey===jersey);
+    if(duplicate){ alert("Jersey number exists!"); return; }
+  }
+
+  let playerData = {
+    name,
+    father: father.value,
+    address: address.value,
+    dob,
+    age,
+    jersey,
+    position: position.value,
+    admissionDate: new Date().toLocaleDateString()
   };
-  let file=photo.files[0];
+
+  let file = photo.files[0];
+
   if(file){
-    let reader=new FileReader();
-    reader.onload=()=>{ player.photo=reader.result; savePlayer(player); };
+    let reader = new FileReader();
+    reader.onload = ()=>{
+      playerData.photo = reader.result;
+      saveData(playerData);
+    };
     reader.readAsDataURL(file);
-  } else savePlayer(player);
+  } else {
+    saveData(playerData);
+  }
 }
 
-function savePlayer(player){
-  db.collection("players").add(player).then(()=>{ alert("Player Added"); resetForm(); });
+function saveData(data){
+  if(editingId){
+    db.collection("players").doc(editingId)
+      .update(data)
+      .then(()=>{ alert("Updated"); resetForm(); });
+  } else {
+    db.collection("players").add(data)
+      .then(()=>{ alert("Added"); resetForm(); });
+  }
 }
 
 function resetForm(){
+  editingId = null;
+  document.getElementById("submitBtn").innerText="Submit Admission";
   document.querySelectorAll("#admission input").forEach(i=>i.value="");
   loadPlayers();
+  showPlayers();
 }
 
 function loadPlayers(){
   db.collection("players").get().then(snapshot=>{
-    players=snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));
+    players = snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));
     renderPlayers(players);
   });
 }
 
+function showPlayers(){
+  showSection("players");
+  loadPlayers();
+}
+
 function renderPlayers(list){
-  playerList.innerHTML=`<div class="total-badge">Total Players: ${list.length}</div>`;
+
+  const playerList = document.getElementById("playerList");
+
+  playerList.innerHTML =
+    `<div class="total-badge">
+        Total Players: ${list.length}
+     </div>`;
+
   list.forEach((p,i)=>{
-    playerList.innerHTML+=`
+    playerList.innerHTML += `
       <div class="player-card">
+
         <div class="player-left">
-          ${p.photo?`<img src="${p.photo}">`:''}
+          ${p.photo?`<img src="${p.photo}">`:``}
           <div class="player-info">
-            <b>${p.name}</b> (${p.position})<br>
-            Jersey: ${p.jersey}<br>
-            Goals: ${p.goals}
+            <div>
+              <span class="player-number">${i+1}.</span>
+              <b>${p.name}</b>
+            </div>
+            Age: ${p.age} <br>
+            Jersey: ${p.jersey} <br>
+            Position: ${p.position}
           </div>
         </div>
+
         <div class="card-actions">
           <button class="info-btn" onclick="showDetails(${i})">ℹ</button>
           <button class="edit-btn" onclick="editPlayer(${i})">✎</button>
           <button class="delete-btn" onclick="deletePlayer(${i})">✖</button>
         </div>
+
       </div>`;
   });
 }
 
+function showDetails(i){
+  let p = players[i];
+  detailBox.innerHTML = `
+    ${p.photo?`<img src="${p.photo}">`:``}
+    <b>Name:</b> ${p.name}<br>
+    <b>Father:</b> ${p.father}<br>
+    <b>Address:</b> ${p.address}<br>
+    <b>DOB:</b> ${p.dob}<br>
+    <b>Age:</b> ${p.age}<br>
+    <b>Jersey:</b> ${p.jersey}<br>
+    <b>Position:</b> ${p.position}<br>
+    <b>Admission Date:</b> ${p.admissionDate}`;
+  showSection("details");
+}
+
+function editPlayer(i){
+  let pass = prompt("Admin password");
+  if(pass!==ADMIN_PASSWORD){ alert("Wrong password"); return; }
+
+  let p = players[i];
+  editingId = p.id;
+  showSection("admission");
+
+  name.value=p.name;
+  father.value=p.father;
+  address.value=p.address;
+  dob.value=p.dob;
+  jersey.value=p.jersey;
+  position.value=p.position;
+
+  submitBtn.innerText="Update Player";
+}
+
+function deletePlayer(i){
+  let pass = prompt("Admin password");
+  if(pass!==ADMIN_PASSWORD){ alert("Wrong password"); return; }
+
+  if(confirm("Delete this player?")){
+    db.collection("players")
+      .doc(players[i].id)
+      .delete()
+      .then(()=>loadPlayers());
+  }
+}
+
 function searchPlayer(){
-  let v=search.value.toLowerCase();
-  renderPlayers(players.filter(p=>p.name.toLowerCase().includes(v)||p.position.toLowerCase().includes(v)));
+  let v = search.value.toLowerCase();
+  renderPlayers(players.filter(p=>
+    p.name.toLowerCase().includes(v)||
+    p.position.toLowerCase().includes(v)||
+    p.age.toString().includes(v)
+  ));
 }
 
-function showGoals(){
-  goalList.innerHTML=`<div class="total-badge">Top Scorers</div>`;
-  players.sort((a,b)=>b.goals-a.goals).forEach(p=>{
-    goalList.innerHTML+=`<div>${p.name} - ${p.goals} Goals</div>`;
-  });
-}
-
-function showDetails(i){ alert(JSON.stringify(players[i])); }
-function editPlayer(i){ alert('Edit player functionality to be added'); }
-function deletePlayer(i){ alert('Delete player functionality to be added'); }
 </script>
 
 </body>
 </html>
+
+
