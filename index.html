@@ -14,13 +14,16 @@
   --dark:#1f2937;
   --light:#f4f6f8;
 }
+
 *{box-sizing:border-box}
+
 body{
   margin:0;
   font-family:"Segoe UI",sans-serif;
   background:var(--light);
   color:var(--dark);
 }
+
 header{
   background:linear-gradient(135deg,var(--primary),#ff9b63);
   color:#fff;
@@ -29,16 +32,19 @@ header{
   font-size:22px;
   font-weight:600;
 }
+
 .container{
   max-width:480px;
   margin:auto;
   padding:16px;
 }
+
 .buttons{
   display:flex;
   gap:12px;
   margin:18px 0;
 }
+
 .buttons button{
   flex:1;
   padding:14px;
@@ -49,6 +55,7 @@ header{
   cursor:pointer;
   color:#fff;
 }
+
 #admissionBtn{background:var(--secondary)}
 #playersBtn{background:var(--primary)}
 
@@ -60,12 +67,7 @@ header{
   box-shadow:0 10px 25px rgba(0,0,0,.08);
 }
 .section.active{display:block}
-.section h3{
-  margin-top:0;
-  font-size:18px;
-  border-bottom:2px solid var(--light);
-  padding-bottom:8px;
-}
+
 input{
   width:100%;
   padding:12px;
@@ -74,6 +76,7 @@ input{
   border:1px solid #d1d5db;
   font-size:14px;
 }
+
 .submit-btn{
   background:var(--primary);
   margin-top:10px;
@@ -87,75 +90,107 @@ input{
   cursor:pointer;
 }
 
+/* ===== TOTAL BADGE ===== */
 .total-badge{
   display:inline-block;
   background:var(--secondary);
   color:#fff;
-  padding:6px 14px;
+  padding:6px 16px;
   border-radius:20px;
   font-size:14px;
-  margin-bottom:12px;
+  margin-bottom:14px;
 }
 
+/* ===== PLAYER CARD FLEX ===== */
 .player-card{
   display:flex;
+  align-items:center;
+  justify-content:space-between;
   gap:12px;
-  padding:12px;
-  margin-top:12px;
-  border-radius:12px;
+  padding:14px;
+  margin-top:14px;
+  border-radius:14px;
   background:#fff;
-  box-shadow:0 4px 12px rgba(0,0,0,.08);
+  box-shadow:0 6px 18px rgba(0,0,0,.08);
+  transition:.3s ease;
 }
-.player-card img{
-  width:50px;
-  height:65px;
-  object-fit:cover;
-  border-radius:4px;
-  border:1px solid #ccc;
+
+.player-card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 12px 25px rgba(0,0,0,.12);
 }
-.player-info{
+
+.player-left{
+  display:flex;
+  gap:12px;
+  align-items:center;
   flex:1;
+}
+
+.player-card img{
+  width:55px;
+  height:70px;
+  object-fit:cover;
+  border-radius:8px;
+  border:2px solid var(--light);
+}
+
+.player-info{
   font-size:14px;
 }
-.player-info b{font-size:15px}
 
 .player-number{
   font-weight:700;
-  font-size:16px;
+  font-size:15px;
   color:var(--primary);
-  margin-right:6px;
 }
 
+/* ===== ICON BUTTONS ===== */
 .card-actions{
   display:flex;
-  gap:6px;
-  margin-top:6px;
+  flex-direction:column;
+  gap:8px;
 }
 
 .card-actions button{
-  width:32px;
-  height:32px;
+  width:36px;
+  height:36px;
   border-radius:50%;
-  padding:0;
-  font-size:14px;
   border:none;
   cursor:pointer;
+  font-size:15px;
   color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:.3s ease;
+  box-shadow:0 4px 10px rgba(0,0,0,.15);
 }
 
-.info-btn{background:var(--secondary)}
-.edit-btn{background:#2563eb}
-.delete-btn{background:#dc2626}
+.card-actions button:hover{
+  transform:scale(1.15);
+}
+
+.info-btn{
+  background:linear-gradient(135deg,#2f7d32,#4caf50);
+}
+
+.edit-btn{
+  background:linear-gradient(135deg,#2563eb,#60a5fa);
+}
+
+.delete-btn{
+  background:linear-gradient(135deg,#dc2626,#f87171);
+}
 
 #detailBox img{
-  width:80px;
-  height:100px;
+  width:90px;
+  height:110px;
   object-fit:cover;
-  border-radius:6px;
-  border:1px solid #ccc;
-  display:block;
+  border-radius:8px;
   margin-bottom:10px;
 }
+
 footer{
   margin-top:25px;
   padding:12px;
@@ -212,6 +247,7 @@ let players = [];
 let editingId = null;
 const ADMIN_PASSWORD = "1234";
 
+/* 🔥 আপনার নিজের Firebase Config বসান */
 const firebaseConfig = {
   apiKey: "AIzaSyCkYMVn0Jh4Oo8Mgm8WyVAOVe65lSLGeks",
   authDomain: "barrahms-app.firebaseapp.com",
@@ -243,55 +279,46 @@ function submitPlayer(){
 
   let dob = document.getElementById("dob").value;
   let age = dob ? new Date().getFullYear() - new Date(dob).getFullYear() : "";
-
   let jersey = document.getElementById("jersey").value;
 
   if(!editingId){
     let duplicate = players.find(p=>p.jersey===jersey);
-    if(duplicate){ alert("Jersey number already exists!"); return; }
+    if(duplicate){ alert("Jersey number exists!"); return; }
   }
 
   let playerData = {
     name,
-    father: document.getElementById("father").value,
-    address: document.getElementById("address").value,
+    father: father.value,
+    address: address.value,
     dob,
     age,
     jersey,
-    position: document.getElementById("position").value,
+    position: position.value,
     admissionDate: new Date().toLocaleDateString()
   };
 
-  let file = document.getElementById("photo").files[0];
+  let file = photo.files[0];
 
+  if(file){
+    let reader = new FileReader();
+    reader.onload = ()=>{
+      playerData.photo = reader.result;
+      saveData(playerData);
+    };
+    reader.readAsDataURL(file);
+  } else {
+    saveData(playerData);
+  }
+}
+
+function saveData(data){
   if(editingId){
-    if(file){
-      let reader = new FileReader();
-      reader.onload = ()=>{
-        playerData.photo = reader.result;
-        db.collection("players").doc(editingId)
-          .update(playerData)
-          .then(()=>{ alert("Updated Successfully"); resetForm(); });
-      };
-      reader.readAsDataURL(file);
-    }else{
-      db.collection("players").doc(editingId)
-        .update(playerData)
-        .then(()=>{ alert("Updated Successfully"); resetForm(); });
-    }
-  }else{
-    if(file){
-      let reader = new FileReader();
-      reader.onload = ()=>{
-        playerData.photo = reader.result;
-        db.collection("players").add(playerData)
-          .then(()=>{ alert("Admission Successful"); resetForm(); });
-      };
-      reader.readAsDataURL(file);
-    }else{
-      db.collection("players").add(playerData)
-        .then(()=>{ alert("Admission Successful"); resetForm(); });
-    }
+    db.collection("players").doc(editingId)
+      .update(data)
+      .then(()=>{ alert("Updated"); resetForm(); });
+  } else {
+    db.collection("players").add(data)
+      .then(()=>{ alert("Added"); resetForm(); });
   }
 }
 
@@ -327,28 +354,32 @@ function renderPlayers(list){
   list.forEach((p,i)=>{
     playerList.innerHTML += `
       <div class="player-card">
-        ${p.photo?`<img src="${p.photo}">`:``}
-        <div class="player-info">
-          <span class="player-number">${i+1}.</span>
-          <b>${p.name}</b><br>
-          Age: ${p.age}<br>
-          Jersey: ${p.jersey}<br>
-          Position: ${p.position}
 
-          <div class="card-actions">
-            <button class="info-btn" onclick="showDetails(${i})">ℹ️</button>
-            <button class="edit-btn" onclick="editPlayer(${i})">✏️</button>
-            <button class="delete-btn" onclick="deletePlayer(${i})">🗑️</button>
+        <div class="player-left">
+          ${p.photo?`<img src="${p.photo}">`:``}
+          <div class="player-info">
+            <div>
+              <span class="player-number">${i+1}.</span>
+              <b>${p.name}</b>
+            </div>
+            Age: ${p.age} <br>
+            Jersey: ${p.jersey} <br>
+            Position: ${p.position}
           </div>
         </div>
+
+        <div class="card-actions">
+          <button class="info-btn" onclick="showDetails(${i})">ℹ</button>
+          <button class="edit-btn" onclick="editPlayer(${i})">✎</button>
+          <button class="delete-btn" onclick="deletePlayer(${i})">✖</button>
+        </div>
+
       </div>`;
   });
 }
 
 function showDetails(i){
   let p = players[i];
-  const detailBox = document.getElementById("detailBox");
-
   detailBox.innerHTML = `
     ${p.photo?`<img src="${p.photo}">`:``}
     <b>Name:</b> ${p.name}<br>
@@ -359,7 +390,6 @@ function showDetails(i){
     <b>Jersey:</b> ${p.jersey}<br>
     <b>Position:</b> ${p.position}<br>
     <b>Admission Date:</b> ${p.admissionDate}`;
-
   showSection("details");
 }
 
@@ -371,22 +401,21 @@ function editPlayer(i){
   editingId = p.id;
   showSection("admission");
 
-  document.getElementById("submitBtn")
-    .innerText="Update Player";
+  name.value=p.name;
+  father.value=p.father;
+  address.value=p.address;
+  dob.value=p.dob;
+  jersey.value=p.jersey;
+  position.value=p.position;
 
-  document.getElementById("name").value=p.name;
-  document.getElementById("father").value=p.father;
-  document.getElementById("address").value=p.address;
-  document.getElementById("dob").value=p.dob;
-  document.getElementById("jersey").value=p.jersey;
-  document.getElementById("position").value=p.position;
+  submitBtn.innerText="Update Player";
 }
 
 function deletePlayer(i){
   let pass = prompt("Admin password");
   if(pass!==ADMIN_PASSWORD){ alert("Wrong password"); return; }
 
-  if(confirm("Are you sure to delete this player?")){
+  if(confirm("Delete this player?")){
     db.collection("players")
       .doc(players[i].id)
       .delete()
@@ -395,7 +424,7 @@ function deletePlayer(i){
 }
 
 function searchPlayer(){
-  let v = document.getElementById("search").value.toLowerCase();
+  let v = search.value.toLowerCase();
   renderPlayers(players.filter(p=>
     p.name.toLowerCase().includes(v)||
     p.position.toLowerCase().includes(v)||
